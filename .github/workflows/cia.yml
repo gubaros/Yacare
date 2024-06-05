@@ -21,7 +21,7 @@ jobs:
 
     - name: Run code review
       env:
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: python review_code.py
 
