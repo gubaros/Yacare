@@ -57,3 +57,21 @@ except OpenAIError as e:
     print(f"Error interacting with OpenAI: {e}")
     exit(1)
 
+# Crear un comentario en el PR usando la API de GitHub
+comment_url = f"https://api.github.com/repos/{repo_url}/issues/{pr_number}/comments"
+comment_headers = {
+    "Authorization": f"Bearer {os.getenv('GH_TOKEN')}",
+    "Accept": "application/vnd.github.v3+json"
+}
+comment_data = {
+    "body": f"**Code Review by GPT-3.5 Turbo:**\n\n{review_comments}"
+}
+
+try:
+    comment_response = requests.post(comment_url, headers=comment_headers, json=comment_data)
+    comment_response.raise_for_status()
+    print(f"Successfully posted review comment to PR #{pr_number}")
+except requests.exceptions.RequestException as e:
+    print(f"Error posting comment to PR: {e}")
+    exit(1)
+
