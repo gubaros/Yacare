@@ -47,7 +47,7 @@ try:
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt},
         ],
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         max_tokens=300,  # Reducir el número de tokens
         temperature=0.7,  # Ajustar la temperatura para una respuesta más eficiente
     )
