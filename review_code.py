@@ -64,7 +64,7 @@ comment_headers = {
     "Accept": "application/vnd.github.v3+json"
 }
 comment_data = {
-    "body": f"**Code Review by GPT-3.5 Turbo:**\n\n{review_comments}"
+    "body": f"**Code Review by GPT:**\n\n{review_comments}"
 }
 
 try:
