@@ -4,6 +4,12 @@
 
 This repository automates code reviews using OpenAI's GPT-4o Turbo model. When a pull request (PR) is created or updated, the content of the PR is sent to GPT-4o Turbo for a code review. The feedback is then posted as a comment on the PR.
 
+The comment on the PR, provided by GPT, is the biggest contribution with regards to the benefits of using this software. 
+
+## Why 
+
+- ** Based on software quality reports, the code review process and the time that developers take to drive from the code, are among the biggest reasons software quality goes down **
+
 ## How It Works
 
 - **GitHub Actions Workflow**: The workflow is triggered by a `pull_request` event. It checks out the code, sets up Python, installs dependencies, extracts the PR number, and runs the review script.
