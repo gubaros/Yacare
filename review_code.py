@@ -47,11 +47,12 @@ try:
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt},
         ],
-        model="gpt-4-turbo",
+        model="gpt-3.5-turbo",
+        max_tokens=300,  # Reducir el número de tokens
+        temperature=0.7,  # Ajustar la temperatura para una respuesta más eficiente
     )
-    review_comments = chat_completion['choices'][0]['message']['content'].strip()
+    review_comments = chat_completion.choices[0].message["content"].strip()
     print(f"Code Review Comments:\n{review_comments}")
 except OpenAIError as e:
     print(f"Error interacting with OpenAI: {e}")
     exit(1)
-
