@@ -7,7 +7,7 @@ openai.api_key = os.getenv("OPENAI_KEY")
 
 # Obtiene la URL del repositorio y el PR ID
 repo_url = os.getenv("GITHUB_REPOSITORY")
-pr_number = os.getenv("GITHUB_REF").split('/')[-1]
+pr_number = os.getenv("PR_NUMBER")
 
 # Extrae el contenido del PR usando la API de GitHub
 headers = {
@@ -55,4 +55,3 @@ try:
 except requests.exceptions.RequestException as e:
     print(f"Error sending data to the endpoint: {e}")
     exit(1)
-
