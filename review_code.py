@@ -42,17 +42,18 @@ for file in pr_files:
 prompt = f"Please review the following pull request:\n\n{files_content}\n\nProvide feedback on the code quality, potential bugs, and improvements."
 
 try:
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt},
+        ],
         max_tokens=500,
-        n=1,
-        stop=None,
-        temperature=0.5
+        temperature=0.5,
     )
-    review_comments = response.choices[0].text.strip()
+    review_comments = response.choices[0].message["content"].strip()
     print(f"Code Review Comments:\n{review_comments}")
-except openai.error.OpenAIError as e:
+except openai.OpenAIError as e:
     print(f"Error interacting with OpenAI: {e}")
     exit(1)
 
