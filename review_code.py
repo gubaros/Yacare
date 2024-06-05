@@ -47,7 +47,7 @@ try:
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt},
         ],
-        model="gpt-3.5-turbo",
+        model="gpt-4-turbo",
     )
     review_comments = chat_completion['choices'][0]['message']['content'].strip()
     print(f"Code Review Comments:\n{review_comments}")
