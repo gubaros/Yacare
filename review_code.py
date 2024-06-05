@@ -3,7 +3,7 @@ import requests
 from openai import OpenAI, OpenAIError
 
 # Configuración de la API de OpenAI
-client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Obtiene la URL del repositorio y el PR ID
 repo_url = os.getenv("GITHUB_REPOSITORY")
