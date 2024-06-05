@@ -1,6 +1,6 @@
 import os
 import requests
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 
 # Configuración de la API de OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
@@ -51,7 +51,7 @@ try:
     )
     review_comments = chat_completion['choices'][0]['message']['content'].strip()
     print(f"Code Review Comments:\n{review_comments}")
-except openai.error.OpenAIError as e:
+except OpenAIError as e:
     print(f"Error interacting with OpenAI: {e}")
     exit(1)
 
