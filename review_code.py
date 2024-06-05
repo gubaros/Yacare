@@ -17,6 +17,7 @@ headers = {
 
 # La URL debe tener el formato correcto, asegurándose de usar el número del PR
 url = f"https://api.github.com/repos/{repo_url}/pulls/{pr_number}/files"
+print(f"Fetching PR files from URL: {url}")
 
 try:
     response = requests.get(url, headers=headers)
@@ -50,4 +51,8 @@ try:
     response = requests.post(endpoint, json=data)
     response.raise_for_status()
     review_comments = response.json()
+    print(review_comments)
+except requests.exceptions.RequestException as e:
+    print(f"Error sending data to the endpoint: {e}")
+    exit(1)
 
