@@ -1,54 +1,57 @@
 import os
 import requests
-import openai
+from openai import OpenAI, OpenAIError
 
 # Configuración de la API de OpenAI
-openai.api_key = os.getenv("OPENAI_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Obtiene la URL del repositorio y el PR ID
 repo_url = os.getenv("GITHUB_REPOSITORY")
-pr_id = os.getenv("GITHUB_REF").split('/')[-1]
+pr_number = os.getenv("PR_NUMBER")
+
+# Verificar que PR_NUMBER se ha obtenido correctamente
+print(f"PR Number: {pr_number}")
 
 # Extrae el contenido del PR usando la API de GitHub
 headers = {
     "Accept": "application/vnd.github.v3+json",
-    "Authorization": f"token {os.getenv('GH_TOKEN')}"
+    "Authorization": f"Bearer {os.getenv('GH_TOKEN')}"
 }
 
+# La URL debe tener el formato correcto, asegurándose de usar el número del PR
+url = f"https://api.github.com/repos/{repo_url}/pulls/{pr_number}/files"
+print(f"Fetching PR files from URL: {url}")
+
 try:
-    response = requests.get(f"https://api.github.com/repos/{repo_url}/pulls/{pr_id}/files", headers=headers)
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
     pr_files = response.json()
 except requests.exceptions.RequestException as e:
     print(f"Error fetching PR files: {e}")
     exit(1)
 
-# Preparar los archivos para el envío al endpoint
-files_content = {}
+# Preparar el contenido del PR para enviarlo a OpenAI
+files_content = ""
 for file in pr_files:
     file_path = file.get("filename")
-    if file_path:
-        try:
-            with open(file_path, 'r') as f:
-                files_content[file_path] = f.read()
-        except FileNotFoundError:
-            print(f"File not found: {file_path}")
-        except IOError as e:
-            print(f"Error reading file {file_path}: {e}")
+    patch = file.get("patch")
+    if file_path and patch:
+        files_content += f"File: {file_path}\n{patch}\n\n"
 
-# Enviar el contenido al endpoint del servicio
-endpoint = "http://tu_servicio_endpoint/api/compare"
-data = {
-    "pr_content": files_content,
-    "branch": "main"  # Puedes cambiar esto según sea necesario
-}
+# Interactuar con OpenAI para hacer la revisión del código
+prompt = f"Please review the following pull request:\n\n{files_content}\n\nProvide feedback on the code quality, potential bugs, and improvements."
 
 try:
-    response = requests.post(endpoint, json=data)
-    response.raise_for_status()
-    review_comments = response.json()
-    print(review_comments)
-except requests.exceptions.RequestException as e:
-    print(f"Error sending data to the endpoint: {e}")
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt},
+        ],
+        model="gpt-4-turbo",
+    )
+    review_comments = chat_completion['choices'][0]['message']['content'].strip()
+    print(f"Code Review Comments:\n{review_comments}")
+except OpenAIError as e:
+    print(f"Error interacting with OpenAI: {e}")
     exit(1)
 
