@@ -29,4 +29,3 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         PR_NUMBER: ${{ env.PR_NUMBER }}
       run: python review_code.py
-
