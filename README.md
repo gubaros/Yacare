@@ -1,3 +1,5 @@
+[![Code Review with GPT](https://github.com/gubaros/ai-cr/actions/workflows/cia.yml/badge.svg)](https://github.com/gubaros/ai-cr/actions/workflows/cia.yml)
+
 # Code Review with GPT
 
 This repository automates code reviews using OpenAI's GPT-3.5 Turbo model. When a pull request (PR) is created or updated, the content of the PR is sent to GPT-3.5 Turbo for a code review. The feedback is then posted as a comment on the PR.
