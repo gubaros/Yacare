@@ -1,9 +1,9 @@
 import os
 import requests
-import openai
+from openai import OpenAI
 
 # Configuración de la API de OpenAI
-openai.api_key = os.getenv("OPENAI_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
 
 # Obtiene la URL del repositorio y el PR ID
 repo_url = os.getenv("GITHUB_REPOSITORY")
@@ -42,16 +42,14 @@ for file in pr_files:
 prompt = f"Please review the following pull request:\n\n{files_content}\n\nProvide feedback on the code quality, potential bugs, and improvements."
 
 try:
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+    chat_completion = client.chat.completions.create(
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt},
         ],
-        max_tokens=500,
-        temperature=0.5,
+        model="gpt-3.5-turbo",
     )
-    review_comments = response['choices'][0]['message']['content'].strip()
+    review_comments = chat_completion['choices'][0]['message']['content'].strip()
     print(f"Code Review Comments:\n{review_comments}")
 except openai.error.OpenAIError as e:
     print(f"Error interacting with OpenAI: {e}")
