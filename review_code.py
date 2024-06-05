@@ -9,6 +9,9 @@ openai.api_key = os.getenv("OPENAI_KEY")
 repo_url = os.getenv("GITHUB_REPOSITORY")
 pr_number = os.getenv("PR_NUMBER")
 
+# Verificar que PR_NUMBER se ha obtenido correctamente
+print(f"PR Number: {pr_number}")
+
 # Extrae el contenido del PR usando la API de GitHub
 headers = {
     "Accept": "application/vnd.github.v3+json",
