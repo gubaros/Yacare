@@ -1,54 +1,33 @@
-from flask import Flask, request, jsonify
+import os
+import requests
 import openai
 
-app = Flask(__name__)
+# Configuración de la API de OpenAI
+openai.api_key = os.getenv("OPENAI_KEY")
 
-openai.api_key = "sk-proj-1P9qdaE11afpGTuyVd38T3BlbkFJGYWh5QKiWqJsBfmay5ll"
+# Obtiene la URL del repositorio y el PR ID
+repo_url = os.getenv("GITHUB_REPOSITORY")
+pr_id = os.getenv("GITHUB_REF").split('/')[-1]
 
-@app.route('/api/compare', methods=['POST'])
-def compare_code():
-    data = request.get_json()
-    pr_content = data["pr_content"]
-    branch = data.get("branch", "main")
+# Extrae el contenido del PR usando la API de GitHub
+response = requests.get(f"https://api.github.com/repos/{repo_url}/pulls/{pr_id}/files")
+pr_files = response.json()
 
-    main_content = get_main_branch_content(branch)
+# Preparar los archivos para el envío al endpoint
+files_content = {}
+for file in pr_files:
+    file_path = file["filename"]
+    with open(file_path, 'r') as f:
+        files_content[file_path] = f.read()
 
-    review_comments = []
-    for file_path, pr_code in pr_content.items():
-        main_code = main_content.get(file_path, "")
-        prompt = f"""
-        Review the following Pull Request for code quality, style, and best practices. Provide detailed feedback and suggestions for improvement.
+# Enviar el contenido al endpoint del servicio
+endpoint = "http://tu_servicio_endpoint/api/compare"
+data = {
+    "pr_content": files_content,
+    "branch": "main"  # Puedes cambiar esto según sea necesario
+}
+response = requests.post(endpoint, json=data)
 
-        PR Content:
-        {pr_code}
-
-        Existing Code on {branch}:
-        {main_code}
-
-        Focus on the following aspects:
-        1. Code readability and maintainability.
-        2. Potential bugs and logical errors.
-        3. Compliance with coding standards and best practices.
-        4. Efficiency and performance improvements.
-
-        Provide your review below:
-        """
-        response = openai.Completion.create(
-            engine="davinci-codex",
-            prompt=prompt,
-            max_tokens=500
-        )
-        review_comments.append({
-            "file": file_path,
-            "review": response.choices[0].text
-        })
-
-    return jsonify(review_comments)
-
-def get_main_branch_content(branch):
-    # Implement this function to fetch the main branch content
-    pass
-
-if __name__ == '__main__':
-    app.run(debug=True)
+# Manejo de la respuesta
+print(response.json())
 
