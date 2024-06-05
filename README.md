@@ -2,7 +2,7 @@
 
 # Code Review with GPT
 
-This repository automates code reviews using OpenAI's GPT-3.5 Turbo model. When a pull request (PR) is created or updated, the content of the PR is sent to GPT-3.5 Turbo for a code review. The feedback is then posted as a comment on the PR.
+This repository automates code reviews using OpenAI's GPT-4o Turbo model. When a pull request (PR) is created or updated, the content of the PR is sent to GPT-4o Turbo for a code review. The feedback is then posted as a comment on the PR.
 
 ## How It Works
 
@@ -10,9 +10,9 @@ This repository automates code reviews using OpenAI's GPT-3.5 Turbo model. When 
 
 - **PR Content Fetching**: The script fetches the files changed in the PR using GitHub's API.
 
-- **Interaction with OpenAI**: The content of the PR is sent to OpenAI's GPT-3.5 Turbo model with a prompt to review the code for quality, potential bugs, and improvements.
+- **Interaction with OpenAI**: The content of the PR is sent to OpenAI's GPT-4o Turbo model with a prompt to review the code for quality, potential bugs, and improvements.
 
-- **Posting Review Comments**: The feedback from GPT-3.5 Turbo is then posted as a comment on the PR using GitHub's API.
+- **Posting Review Comments**: The feedback from GPT-4o Turbo is then posted as a comment on the PR using GitHub's API.
 
 ## Setup
 
@@ -32,3 +32,11 @@ Once the setup is complete, any new pull request or updates to an existing pull 
 
 The purpose of this tool is to streamline the code review process by leveraging AI to provide automated feedback, ensuring code quality and identifying potential issues early in the development process.
 
+## Improving 
+
+1. ** You might want to consider which GPT model to use and review the python script to manipulate the right model 
+2. ** You might want to fine tune the temperature. Refer to the GPT API temperature docs for further details on this. 
+3. ** You might want to extend the code review strategy and execute a complete checkout (instead of the PR files) so that the code review gains an optimal context, though this will definitely chew tokens from your account. 
+
+
+Guido Barosio <guido@bravo47.com>
