@@ -53,7 +53,7 @@ try:
     )
     review_comments = response.choices[0].message["content"].strip()
     print(f"Code Review Comments:\n{review_comments}")
-except openai.OpenAIError as e:
+except openai.error.OpenAIError as e:
     print(f"Error interacting with OpenAI: {e}")
     exit(1)
 
