@@ -7,16 +7,19 @@ openai.api_key = os.getenv("OPENAI_KEY")
 
 # Obtiene la URL del repositorio y el PR ID
 repo_url = os.getenv("GITHUB_REPOSITORY")
-pr_id = os.getenv("GITHUB_REF").split('/')[-1]
+pr_number = os.getenv("GITHUB_REF").split('/')[-1]
 
 # Extrae el contenido del PR usando la API de GitHub
 headers = {
     "Accept": "application/vnd.github.v3+json",
-    "Authorization": f"token {os.getenv('GH_TOKEN')}"
+    "Authorization": f"Bearer {os.getenv('GH_TOKEN')}"
 }
 
+# La URL debe tener el formato correcto, asegurándose de usar el número del PR
+url = f"https://api.github.com/repos/{repo_url}/pulls/{pr_number}/files"
+
 try:
-    response = requests.get(f"https://api.github.com/repos/{repo_url}/pulls/{pr_id}/files", headers=headers)
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
     pr_files = response.json()
 except requests.exceptions.RequestException as e:
@@ -47,8 +50,4 @@ try:
     response = requests.post(endpoint, json=data)
     response.raise_for_status()
     review_comments = response.json()
-    print(review_comments)
-except requests.exceptions.RequestException as e:
-    print(f"Error sending data to the endpoint: {e}")
-    exit(1)
 
