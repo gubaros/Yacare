@@ -22,6 +22,7 @@ jobs:
     - name: Extract PR number
       id: extract_pr
       run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
     - name: Extract OPENAI_API_KEY
       run: echo "OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}"
 
