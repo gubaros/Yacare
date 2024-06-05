@@ -51,8 +51,9 @@ try:
         max_tokens=300,  # Reducir el número de tokens
         temperature=0.7,  # Ajustar la temperatura para una respuesta más eficiente
     )
-    review_comments = chat_completion.choices[0].message["content"].strip()
+    review_comments = chat_completion.choices[0].message.content.strip()
     print(f"Code Review Comments:\n{review_comments}")
 except OpenAIError as e:
     print(f"Error interacting with OpenAI: {e}")
     exit(1)
+
