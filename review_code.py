@@ -12,7 +12,7 @@ pr_id = os.getenv("GITHUB_REF").split('/')[-1]
 # Extrae el contenido del PR usando la API de GitHub
 headers = {
     "Accept": "application/vnd.github.v3+json",
-    "Authorization": f"token {os.getenv('GITHUB_TOKEN')}"
+    "Authorization": f"token {os.getenv('GH_TOKEN')}"
 }
 
 try:
