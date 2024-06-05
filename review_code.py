@@ -39,7 +39,7 @@ for file in pr_files:
         files_content += f"File: {file_path}\n{patch}\n\n"
 
 # Interactuar con OpenAI para hacer la revisión del código
-prompt = f"Please review the following pull request:\n\n{files_content}\n\nProvide feedback on the code quality, potential bugs, and improvements."
+prompt = f"Please review the following pull request:\n\n{files_content}\n\nProvide feedback on the code quality, potential bugs, and improvements. For each file, review methods and provide a detailed note on the algorithm complexity presented, if found"
 
 try:
     chat_completion = client.chat.completions.create(
