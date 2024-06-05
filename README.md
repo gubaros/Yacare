@@ -8,7 +8,7 @@ The comment on the PR, provided by GPT, is the biggest contribution with regards
 
 ## Why 
 
-- ** Based on software quality reports, the code review process and the time that developers take to drive from the code, are among the biggest reasons software quality goes down **
+- Based on software quality reports, the code review process and the time that developers take to drive from the code, are among the biggest reasons software quality goes down
 
 ## How It Works
 
@@ -40,9 +40,8 @@ The purpose of this tool is to streamline the code review process by leveraging 
 
 ## Improving 
 
-1. ** You might want to consider which GPT model to use and review the python script to manipulate the right model 
-2. ** You might want to fine tune the temperature. Refer to the GPT API temperature docs for further details on this. 
-3. ** You might want to extend the code review strategy and execute a complete checkout (instead of the PR files) so that the code review gains an optimal context, though this will definitely chew tokens from your account. 
-
+1. You might want to consider which GPT model to use and review the python script to manipulate the right model 
+2. You might want to fine tune the temperature. Refer to the GPT API temperature docs for further details on this. 
+3. You might want to extend the code review strategy and execute a complete checkout (instead of the PR files) so that the code review gains an optimal context, though this will definitely chew tokens from your account. 
 
 Guido Barosio <guido@bravo47.com>
