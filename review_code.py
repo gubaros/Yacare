@@ -53,7 +53,7 @@ try:
             {"role": "user", "content": prompt},
         ],
         model="gpt-4o",
-        max_tokens=300,  # Reducir el número de tokens
+        max_tokens=2000,  # Reducir el número de tokens
         temperature=0.7,  # Ajustar la temperatura para una respuesta más eficiente
     )
     review_comments = chat_completion.choices[0].message.content.strip()
