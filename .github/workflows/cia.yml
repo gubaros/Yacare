@@ -15,10 +15,12 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests openai
+    - name: Download reviewed files state
+      uses: actions/download-artifact@v2
+      with:
+        name: reviewed-files-state
+        path: .
+      continue-on-error: true  # Continua si no se encuentra el artefacto
 
     - name: Prepare state file
       run: |
@@ -26,12 +28,10 @@ jobs:
           echo '{}' > reviewed_files.json
         fi
 
-    - name: Download reviewed files state
-      uses: actions/download-artifact@v2
-      with:
-        name: reviewed-files-state
-        path: .
-      continue-on-error: true  # Continua si no se encuentra el artefacto
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests openai
 
     - name: Extract PR number
       id: extract_pr
