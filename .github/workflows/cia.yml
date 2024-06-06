@@ -5,6 +5,7 @@ on:
 jobs:
   code_review:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -19,11 +20,18 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests openai
 
+    - name: Prepare state file
+      run: |
+        if [ ! -f reviewed_files.json ]; then
+          echo '{}' > reviewed_files.json
+        fi
+
     - name: Download reviewed files state
       uses: actions/download-artifact@v2
       with:
         name: reviewed-files-state
         path: .
+      continue-on-error: true  # Continua si no se encuentra el artefacto
 
     - name: Extract PR number
       id: extract_pr
