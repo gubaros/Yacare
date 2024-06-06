@@ -1,10 +1,11 @@
-# Guido Barosio <guido@bravo47.com>
-# June 2024
-# See LICENSE 
-
 import os
 import requests
+import json
+import hashlib
 from openai import OpenAI, OpenAIError
+
+def calculate_file_hash(content):
+    return hashlib.md5(content.encode()).hexdigest()
 
 # Configuración de la API de OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -34,13 +35,30 @@ except requests.exceptions.RequestException as e:
     print(f"Error fetching PR files: {e}")
     exit(1)
 
+# Leer el archivo de estado de revisiones anteriores
+reviewed_files = {}
+state_file_path = "reviewed_files.json"
+
+if os.path.exists(state_file_path):
+    with open(state_file_path, "r") as f:
+        reviewed_files = json.load(f)
+
 # Preparar el contenido del PR para enviarlo a OpenAI
 files_content = ""
+new_files = False
 for file in pr_files:
     file_path = file.get("filename")
     patch = file.get("patch")
     if file_path and patch:
-        files_content += f"File: {file_path}\n{patch}\n\n"
+        file_hash = calculate_file_hash(patch)
+        if file_path not in reviewed_files or reviewed_files[file_path] != file_hash:
+            files_content += f"File: {file_path}\n{patch}\n\n"
+            reviewed_files[file_path] = file_hash
+            new_files = True
+
+if not new_files:
+    print("No new files to review.")
+    exit(0)
 
 # Interactuar con OpenAI para hacer la revisión del código
 prompt = f"Please review the following pull request:\n\n{files_content}\n\n Please review the following source file for each of the following aspects. Only provide output if its worthy: 1. **Bugs**: Identify any potential bugs or errors in the code.  2. **Computational Complexity**: Analyze the computational complexity of the code and suggest any possible optimizations.  3. **Clean Coding Practices**: Evaluate the code for clean coding practices, including readability, maintainability, and adherence to coding standards.  4. **Coding Standards**: Check for compliance with the relevant coding standards and best practices.  5. **Security**: Identify any potential security vulnerabilities in the code.  6. **Documentation**: Assess the quality and completeness of the code documentation, including comments and inline documentation.  7. **Testing**: Evaluate the adequacy of testing, including the presence and quality of unit tests, integration tests, and other relevant testing practices.  8. **Performance**: Identify any potential performance issues and suggest improvements.  9. **Scalability**: Assess the scalability of the code and recommend any necessary changes to handle increased load or data size.  10. **Code Structure**: Evaluate the overall structure and organization of the code, including the use of design patterns and modularity."
@@ -52,7 +70,7 @@ try:
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt},
         ],
-        model="gpt-4o",
+        model="gpt-3.5-turbo",
         max_tokens=2000,  # Reducir el número de tokens
         temperature=0.7,  # Ajustar la temperatura para una respuesta más eficiente
     )
@@ -79,4 +97,8 @@ try:
 except requests.exceptions.RequestException as e:
     print(f"Error posting comment to PR: {e}")
     exit(1)
+
+# Guardar el estado actualizado de archivos revisados
+with open(state_file_path, "w") as f:
+    json.dump(reviewed_files, f)
 

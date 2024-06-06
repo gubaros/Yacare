@@ -19,6 +19,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests openai
 
+    - name: Download reviewed files state
+      uses: actions/download-artifact@v2
+      with:
+        name: reviewed-files-state
+        path: .
+
     - name: Extract PR number
       id: extract_pr
       run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
@@ -29,4 +35,11 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         PR_NUMBER: ${{ env.PR_NUMBER }}
       run: python review_code.py
+
+    - name: Upload reviewed files state
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: reviewed-files-state
+        path: reviewed_files.json
 
