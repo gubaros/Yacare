@@ -4,7 +4,7 @@
 
 This repository automates code reviews using OpenAI's GPT-4o Turbo model. When a pull request (PR) is created or updated, the content of the PR is sent to GPT-4o Turbo for a code review. The feedback is then posted as a comment on the PR.
 
-The comment on the PR, provided by GPT, is the biggest contribution with regards to the benefits of using this software. 
+The comment (AKA "a code review comment") on the PR, provided by GPT, is the main contribution with regards to the benefits of using this software. 
 
 ## Why 
 
