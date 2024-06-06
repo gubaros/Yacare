@@ -43,18 +43,8 @@ for file in pr_files:
         files_content += f"File: {file_path}\n{patch}\n\n"
 
 # Interactuar con OpenAI para hacer la revisión del código
-prompt = f"Please review the following pull request:\n\n{files_content}\n\n Please review the following source file for each of the following aspects. Only provide output if its worthy:
-1. **Bugs**: Identify any potential bugs or errors in the code.
-2. **Computational Complexity**: Analyze the computational complexity of the code and suggest any possible optimizations.
-3. **Clean Coding Practices**: Evaluate the code for clean coding practices, including readability, maintainability, and adherence to coding standards.
-4. **Coding Standards**: Check for compliance with the relevant coding standards and best practices.
-5. **Security**: Identify any potential security vulnerabilities in the code.
-6. **Documentation**: Assess the quality and completeness of the code documentation, including comments and inline documentation.
-7. **Testing**: Evaluate the adequacy of testing, including the presence and quality of unit tests, integration tests, and other relevant testing practices.
-8. **Performance**: Identify any potential performance issues and suggest improvements.
-9. **Scalability**: Assess the scalability of the code and recommend any necessary changes to handle increased load or data size.
-10. **Code Structure**: Evaluate the overall structure and organization of the code, including the use of design patterns and modularity."
-#Provide feedback on the code quality, potential bugs, and improvements. For each file, review methods and provide a detailed note on the algorithm complexity presented, if found"
+prompt = f"Please review the following pull request:\n\n{files_content}\n\n Please review the following source file for each of the following aspects. Only provide output if its worthy: 1. **Bugs**: Identify any potential bugs or errors in the code.  2. **Computational Complexity**: Analyze the computational complexity of the code and suggest any possible optimizations.  3. **Clean Coding Practices**: Evaluate the code for clean coding practices, including readability, maintainability, and adherence to coding standards.  4. **Coding Standards**: Check for compliance with the relevant coding standards and best practices.  5. **Security**: Identify any potential security vulnerabilities in the code.  6. **Documentation**: Assess the quality and completeness of the code documentation, including comments and inline documentation.  7. **Testing**: Evaluate the adequacy of testing, including the presence and quality of unit tests, integration tests, and other relevant testing practices.  8. **Performance**: Identify any potential performance issues and suggest improvements.  9. **Scalability**: Assess the scalability of the code and recommend any necessary changes to handle increased load or data size.  10. **Code Structure**: Evaluate the overall structure and organization of the code, including the use of design patterns and modularity."
+ #Provide feedback on the code quality, potential bugs, and improvements. For each file, review methods and provide a detailed note on the algorithm complexity presented, if found"
 
 try:
     chat_completion = client.chat.completions.create(
