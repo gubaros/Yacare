@@ -23,7 +23,7 @@ char *find_redirect(const char *key) {
         return NULL;
     }
 
-    cdb_init(&cdb, fd);
+    cdb_init(&cdb, fd)
 
     unsigned klen = strlen(key);
     char *value = NULL;
