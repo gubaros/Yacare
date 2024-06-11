@@ -38,12 +38,14 @@ Once the setup is complete, any new pull request or updates to an existing pull 
 
 ## Purpose
 
-The purpose of this tool is to streamline the code review process by leveraging AI to provide automated feedback, ensuring code quality and identifying potential issues early in the development process.
+The purpose of this tool is to streamline the code review process by leveraging AI to provide automated feedback, ensuring code quality and identifying potential issues early in the development process. 
 
-## Improving 
+## Considerations 
 
 1. You might want to consider which GPT model to use and review the python script to manipulate the right model 
 2. You might want to fine tune the temperature. Refer to the GPT API temperature docs for further details on this. 
-3. You might want to extend the code review strategy and execute a complete checkout (instead of the PR files) so that the code review gains an optimal context, though this will definitely chew tokens from your account. 
+3. You might want to extend the code review strategy and execute a complete checkout (instead of the PR files) so that the code review gains an optimal context, though this will definitely chew tokens from your account.
+4. You might want to develop a mechanism to avoid pitfalls, false-positives, and such.
+5. Reading an automatically generated code review might create and index a bias, obfuscating underlying real problems not detected by AI. Your role, as a Software Engineer, is to stand by as a Developer in the loop. 
 
 Guido Barosio <guido@bravo47.com>
