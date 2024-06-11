@@ -1,5 +1,7 @@
 [![Code Review with GPT](https://github.com/gubaros/ai-cr/actions/workflows/cia.yml/badge.svg)](https://github.com/gubaros/ai-cr/actions/workflows/cia.yml)
 
+Yacaré, yet another code automated review engine (?)
+
 # Code Review with GPT
 
 This repository automates code reviews using OpenAI's GPT-4o Turbo model. When a pull request (PR) is created or updated, the content of the PR is sent to GPT-4o Turbo for a code review. The feedback is then posted as a comment on the PR.
