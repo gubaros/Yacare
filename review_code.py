@@ -1,104 +1,87 @@
 import os
 import requests
 import json
-import hashlib
-from openai import OpenAI, OpenAIError
+from openai import OpenAI
 
-def calculate_file_hash(content):
-    return hashlib.md5(content.encode()).hexdigest()
+def get_full_repository_context():
+    context = ""
+    for root, dirs, files in os.walk("."):
+        if ".git" in dirs:
+            dirs.remove(".git")  # Excluir el directorio .git
+        for file in files:
+            file_path = os.path.join(root, file)
+            try:
+                with open(file_path, 'r') as f:
+                    content = f.read()
+                    # Limitar el contenido para evitar exceder los límites de tokens
+                    if len(content) > 1000:
+                        content = content[:500] + "... [content truncated] ..." + content[-500:]
+                    context += f"File: {file_path}\n{content}\n\n"
+            except Exception as e:
+                print(f"Could not read file {file_path}: {str(e)}")
+    return context
 
-# Configuración de la API de OpenAI
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-# Obtiene la URL del repositorio y el PR ID
-repo_url = os.getenv("GITHUB_REPOSITORY")
-pr_number = os.getenv("PR_NUMBER")
-
-# Verificar que PR_NUMBER se ha obtenido correctamente
-print(f"PR Number: {pr_number}")
-
-# Extrae el contenido del PR usando la API de GitHub
-headers = {
-    "Accept": "application/vnd.github.v3+json",
-    "Authorization": f"Bearer {os.getenv('GH_TOKEN')}"
-}
-
-# La URL debe tener el formato correcto, asegurándose de usar el número del PR
-url = f"https://api.github.com/repos/{repo_url}/pulls/{pr_number}/files"
-print(f"Fetching PR files from URL: {url}")
-
-try:
+def get_pr_files(repo_url, pr_number, headers):
+    url = f"https://api.github.com/repos/{repo_url}/pulls/{pr_number}/files"
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    pr_files = response.json()
-except requests.exceptions.RequestException as e:
-    print(f"Error fetching PR files: {e}")
-    exit(1)
+    return response.json()
 
-# Leer el archivo de estado de revisiones anteriores
-reviewed_files = {}
-state_file_path = "reviewed_files.json"
+def main():
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    repo_url = os.getenv("GITHUB_REPOSITORY")
+    pr_number = os.getenv("PR_NUMBER")
+    gh_token = os.getenv("GH_TOKEN")
 
-if os.path.exists(state_file_path):
-    with open(state_file_path, "r") as f:
-        reviewed_files = json.load(f)
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "Authorization": f"Bearer {gh_token}"
+    }
 
-# Preparar el contenido del PR para enviarlo a OpenAI
-files_content = ""
-new_files = False
-for file in pr_files:
-    file_path = file.get("filename")
-    patch = file.get("patch")
-    if file_path and patch:
-        file_hash = calculate_file_hash(patch)
-        if file_path not in reviewed_files or reviewed_files[file_path] != file_hash:
-            files_content += f"File: {file_path}\n{patch}\n\n"
-            reviewed_files[file_path] = file_hash
-            new_files = True
+    pr_files = get_pr_files(repo_url, pr_number, headers)
+    
+    full_context = get_full_repository_context()
+    
+    pr_changes = "\n".join([f"File: {file['filename']}\n{file.get('patch', 'No patch available')}" for file in pr_files])
 
-if not new_files:
-    print("No new files to review.")
-    exit(0)
+    prompt = f"""
+    Full Repository context:
+    {full_context}
 
-# Interactuar con OpenAI para hacer la revisión del código
-prompt = f"Please review the following pull request:\n\n{files_content}\n\n Please review the following source file for each of the following aspects. Only provide output if its worthy: 1. **Bugs**: Identify any potential bugs or errors in the code.  2. **Computational Complexity**: Analyze the computational complexity of the code and suggest any possible optimizations.  3. **Clean Coding Practices**: Evaluate the code for clean coding practices, including readability, maintainability, and adherence to coding standards.  4. **Coding Standards**: Check for compliance with the relevant coding standards and best practices.  5. **Security**: Identify any potential security vulnerabilities in the code.  6. **Documentation**: Assess the quality and completeness of the code documentation, including comments and inline documentation.  7. **Testing**: Evaluate the adequacy of testing, including the presence and quality of unit tests, integration tests, and other relevant testing practices.  8. **Performance**: Identify any potential performance issues and suggest improvements.  9. **Scalability**: Assess the scalability of the code and recommend any necessary changes to handle increased load or data size.  10. **Code Structure**: Evaluate the overall structure and organization of the code, including the use of design patterns and modularity."
- #Provide feedback on the code quality, potential bugs, and improvements. For each file, review methods and provide a detailed note on the algorithm complexity presented, if found"
+    Pull request changes:
+    {pr_changes}
 
-try:
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt},
-        ],
-        model="gpt-3.5-turbo",
-        max_tokens=2000,  # Reducir el número de tokens
-        temperature=0.7,  # Ajustar la temperatura para una respuesta más eficiente
-    )
-    review_comments = chat_completion.choices[0].message.content.strip()
-    print(f"Code Review Comments:\n{review_comments}")
-except OpenAIError as e:
-    print(f"Error interacting with OpenAI: {e}")
-    exit(1)
+    Please review the following pull request in the context of the entire repository.
+    Focus on:
+    1. Code quality and best practices
+    2. Potential bugs or errors
+    3. Performance and efficiency
+    4. Consistency with the existing codebase
+    5. Security considerations
+    6. Suggestions for improvements
 
-# Crear un comentario en el PR usando la API de GitHub
-comment_url = f"https://api.github.com/repos/{repo_url}/issues/{pr_number}/comments"
-comment_headers = {
-    "Authorization": f"Bearer {os.getenv('GH_TOKEN')}",
-    "Accept": "application/vnd.github.v3+json"
-}
-comment_data = {
-    "body": f"**Code Review by GPT:**\n\n{review_comments}"
-}
+    Provide a concise but thorough review, considering the full context of the repository.
+    """
 
-try:
-    comment_response = requests.post(comment_url, headers=comment_headers, json=comment_data)
-    comment_response.raise_for_status()
-    print(f"Successfully posted review comment to PR #{pr_number}")
-except requests.exceptions.RequestException as e:
-    print(f"Error posting comment to PR: {e}")
-    exit(1)
+    try:
+        chat_completion = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are an expert code reviewer with knowledge of multiple programming languages and full context of the repository."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=4000,
+            temperature=0.7
+        )
+        review = chat_completion.choices[0].message.content.strip()
 
-# Guardar el estado actualizado de archivos revisados
-with open(state_file_path, "w") as f:
-    json.dump(reviewed_files, f)
+        comment_url = f"https://api.github.com/repos/{repo_url}/issues/{pr_number}/comments"
+        comment_data = {"body": f"**AI Code Review (with full repository context):**\n\n{review}"}
+        comment_response = requests.post(comment_url, headers=headers, json=comment_data)
+        comment_response.raise_for_status()
+        print("Successfully posted review comment")
+    except Exception as e:
+        print(f"Error: {str(e)}")
 
+if __name__ == "__main__":
+    main()
