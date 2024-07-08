@@ -53,6 +53,7 @@ def main():
 
     Please review the following pull request in the context of the entire repository.
     Focus on:
+    0. Cohesion between the style used in the PR and the already existing in the repo. 
     1. Code quality and best practices
     2. Potential bugs or errors
     3. Performance and efficiency
